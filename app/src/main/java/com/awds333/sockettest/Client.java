@@ -1,8 +1,11 @@
 package com.awds333.sockettest;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Observable;
 
@@ -14,6 +17,8 @@ public class Client extends Observable implements Runnable {
     private BufferedReader reader;
     private boolean finish;
     private String message;
+    private String message_out;
+    private PrintWriter out;
 
     Client(String ip, int port) {
         this.ip = ip;
@@ -28,6 +33,9 @@ public class Client extends Observable implements Runnable {
             while (!socket.isConnected()) {
                 Thread.sleep(100);
             }
+            out = new PrintWriter(new BufferedWriter(
+                    new OutputStreamWriter(socket.getOutputStream())),
+                    true);
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             while (!finish) {
                 message = reader.readLine();
@@ -47,6 +55,7 @@ public class Client extends Observable implements Runnable {
             notifyObservers();
         } finally {
             try {
+                out = null;
                 if(socket!=null)
                 socket.close();
             } catch (IOException e) {
@@ -65,4 +74,17 @@ public class Client extends Observable implements Runnable {
     public String getException() {
         return exception;
     }
+    public void sendMessage(final String message_out1){
+        if(out!=null&&message_out1.length()>0){
+            this.message_out =message_out1;
+            Thread tr = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    out.println(message_out);
+                }
+            });
+            tr.start();
+        }
+    }
+
 }

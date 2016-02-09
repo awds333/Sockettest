@@ -8,6 +8,7 @@ import android.os.Message;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +38,13 @@ public class MainActivity extends Activity implements Observer {
         l = (LinearLayout) findViewById(R.id.lin);
         p = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         thread.start();
+        ((Button)findViewById(R.id.button2)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                client.sendMessage(((EditText)findViewById(R.id.editText)).getText().toString());
+                ((EditText) findViewById(R.id.editText)).setText("");
+            }
+        });
         h = new Handler() {
             @Override
             public void handleMessage(Message msg) {
